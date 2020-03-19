@@ -370,6 +370,9 @@ git branch -vv
 		 behind 1 本地分支落后1个版本
 		 
 git fetch --all; git branch -vv  #同步远程，并显示详细的版本信息
+
+(7)推送远程dev分支，并track
+git push -u origin dev
 ```
 
 <font color="red">注：git pull   == git fetch + git merge</font>
