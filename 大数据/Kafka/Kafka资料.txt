@@ -1,0 +1,25 @@
+Confluent Kafka  (Security、Streaming)
+
+
+
+页缓存-由操作系统实现
+append Only
+
+
+zero copy特性，producer与consumer不能落后太多，落后太多丢失zero copy特性
+
+1. 写入：页缓存 --- 硬盘    
+2. 读取： 页缓存（寻找）无 读取硬盘->页缓存->内核态->用户态->发送
+FileTransferTo
+FileTransferFrom
+
+kafka 索引
+
+
+RandomAccessFile   r
+r.seek()
+
+
+File file
+BufferedInputStream bs 
+bis.skip()
