@@ -201,3 +201,21 @@ JDK 1.8 之所以添加红黑树是因为一旦链表过长，会严重影响 Ha
 5、模版方法模式：定义了一个算法的骨架，而将一些步骤延迟到子类中，模版方法使得子类可以在不改变算法结构的情况下，重新定义算法的步骤。
 6、状态模式：允许对象在内部状态改变时改变它的行为，对象看起来好像修改了它的类。
 7、装饰器设计模式：（Decorator design pattern）被用于多个 Java IO 类中
+
+## 额外知识
+#### 1.Spring框架的理解
+
+Spring框架的核心思想就是抽象，IOC和AOP时核心功能。从整体来看Spring框架，可以抽离出几大核心顶级接口：BeanDefinetionReader、BeanFactoryPostProcesser、PostPrecesser、BeanFactory、FactoryBean和Environment，这些接口依次负责Bean的配置信息读取、增强、装载以及环境变量依赖，这几个接口就是Spring框架的核心。
+
+Spring中Bean的声明周期，可以看AbstractApplicationContext的refresh方法，debug通读，大致流程：先经历一堆xxxAware把Bean需要的Spring组件调用各种setXxx给bean(比如setApplicationContext)，然后执行前置增强，也就是postprocesser的beforeinitializing；执行完后就开始初始化bean，初始化方法，然后后置增强，接着disposebean，最后destory。值得注意的是，postprocesser是有顺序的，定了priorityOrder的会先被执行，然后再执行带了order的。
+
+#### 2. 抽象类和接口有哪些相同点和不同点
+相同点：
+（1） 都不能被实例化
+（2）接口的实现类或抽象类的子类都必须实现抽象发布方法
+
+不同点： 
+（1）接口只有定义，不能有方法的实现，java1.8中可以定义default方法体，而抽象类可以有定义与实现，方法可在抽象类中实现
+（2）单继承多实现，接口中的变量均为public static final，必须有初值并且不能修改；抽象类中的成员变量为default可以被修改，抽象方法不能被private、static、native、synchrionzed修饰
+（3）接口常用来约定、规范功能，便于维护添加具体的实现类，抽象类倾向于充当公共方法模板的角色，不适用于频繁修改的代码类。
+（4）接口定义行为，抽象类即定义行为也负责实现
