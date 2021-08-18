@@ -92,3 +92,5 @@ public final class DirectByteBufferCleaner {
 - 不要经常调用MappedByteBuffer.force()方法，这个方法强制操作系统将内存中的内容写入硬盘，所以如果你在每次写内存映射文件后都调用force()方法，你就不能真正从内存映射文件中获益，而是跟disk IO差不多。
 - 如果电源故障或者主机瘫痪，有可能内存映射文件还没有写入磁盘，意味着可能会丢失一些关键数据。
 - MappedByteBuffer和文件映射在缓存被GC之前都是有效的。sun.misc.Cleaner可能是清除内存映射文件的唯一选择。
+- 初始化 DirectByteBuffer对象时，如果当前堆外内存的条件很苛刻时，会主动调用 System.gc()强制执行FGC。所以一般建议在使用netty时开启XX:+DisableExplicitGC
+
