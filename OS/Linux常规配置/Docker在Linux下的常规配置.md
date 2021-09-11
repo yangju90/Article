@@ -15,4 +15,6 @@ echo 'fi' >> ~/.bashrc
 
 #### 二、用户添加到docker命令组
 
+```shell
 sudo usermod -aG docker $USER
+```
