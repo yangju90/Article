@@ -18,6 +18,7 @@
 ```java
 1) 查看Linux版本
     cat /etc/issue
+    uname -a
 ```
 
 
