@@ -1,3 +1,5 @@
+
+```groovy
 static  def getAppVersionName() {
     def cmd = 'git describe --tags --abbrev=0'
     cmd.execute().text.trim()
@@ -113,3 +115,5 @@ android {
     }
 
 }
+
+```
