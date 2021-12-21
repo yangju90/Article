@@ -320,6 +320,8 @@ subscribe:1
 
 （6）timer、interval
 
+  timeInterval()返回Timed包裝對象，可以获取执行时间
+
 （7）buffer
 
 ```java
