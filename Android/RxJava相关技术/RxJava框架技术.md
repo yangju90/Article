@@ -356,3 +356,53 @@ public void reduceTest(){
 subscribe:78
 ```
 
+
+
+### 3.3 背压 BackPressure
+
+- Cold Observables：指的是那些在订阅之后才开始发送事件的Observable（每个Subscriber都能接收到完整的事件）。
+- Hot Observables:     指的是那些在创建了Observable之后，（不管是否订阅）就开始发送事件的Observable
+
+>
+> 注意：背压这个话题本身，就是生产者与消费者速率不等产生的，所以在RxJava中，生产者、消费者必须在不同的线程，如果在同一个线程则为同步调用。RxJava2 Observable本身不支持背压策略，默认使用内存堆积
+
+
+
+（1）Observable 内存堆积Demo
+
+```java
+Disposable disposable = Observable.create((ObservableEmitter<int[]> emiter) -> {
+    emiter.onNext(new int[1024]);
+    emiter.onComplete();
+})
+    .repeat()
+    .subscribeOn(Schedulers.newThread())
+    .observeOn(Schedulers.io())
+    .subscribe((int[] s) -> {
+        System.out.println(s.length);
+        Thread.sleep(1000);
+    });  
+ 
+输出结果：
+1024
+1024
+1024
+1024
+Exception: java.lang.OutOfMemoryError thrown from the UncaughtExceptionHandler in thread "RxCachedThreadScheduler-1"
+ 
+Exception: java.lang.OutOfMemoryError thrown from the UncaughtExceptionHandler in thread "RxNewThreadScheduler-1"
+ 
+Exception: java.lang.OutOfMemoryError thrown from the UncaughtExceptionHandler in thread "RxSchedulerPurge-1"
+```
+
+
+（2）Flowable
+
+
+
+（3）BackpressStrategy
+
+- BackpressStrategy.ERROR   事件堆积，首先会放入缓存池，缓存池满则抛出异常
+- BackpressStrategy.BUFFER 事件堆积，放入无限制的缓存池，OOM
+- BackpressStrategy.DROP     事件堆积，超出缓存池的，丢弃多余事件
+- BackpressStrategy.LATEST  同Drop，区别在于总是会保留最后一个发送的事件
