@@ -161,7 +161,7 @@ docker images 查看镜像
 docker ps   查看正在运行容器
 docker ps -a  查看所有容器
 
-docker rmi 镜像id
+docker rmi -f 镜像id
 docker rm 容器id
 ```
 

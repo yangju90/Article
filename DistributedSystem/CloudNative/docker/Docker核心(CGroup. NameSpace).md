@@ -1,4 +1,4 @@
-<div align=center><font face="黑体" size=6>Docke核心(Cgroup.Namespace)</font></div>
+<div align=center><font face="黑体" size=6>Docker核心(Cgroup.Namespace)</font></div>
 
 > docker核心Linux相关知识
 
@@ -7,6 +7,7 @@
   * namespace 概述
   * namespace 作用
   * namespace 命令
+* Docker核心网络
 
 
 
@@ -17,10 +18,6 @@
 cgroups全称 Control Group 是linux系统内核中资源控制的工具， 可以对CPU、内存、磁盘I/O、网络等进程所需的资源进行限制。
 
 
-
-
-
-#### 
 
 # Namespace
 
@@ -41,3 +38,23 @@ lsns -t <type>   # 查看对应类型的namespace (net mnt ipc pid uts user)
 
 
 
+# 网络
+
+#### 1. 单主机网络模式
+
+* Null （--net=None）  
+  * 把容放入独立的网络空间但不做任何网络配置 （创建namespace ，但不配置）
+  * 用户需要通过独立运行docker network命令来完成网络配置
+* Host
+  * 使用主机网络名空间，复用主机网络
+* Container
+  * 重用其他容器网络 （多个进程采用容器部署之间的通信方案，a. 多个进程放入同一个容器中 b. 多个容器运行过程中共享同一个namespace）
+* Bridge （--net=bridge）在启动容器时不添加网络参数时，默认的模式
+  * 使用Linux网桥和iptables提供容器互联，Docker在每台主机上创建一个名叫docker0的网桥，通过veth pair来链接该主机的每一个EndPoint
+
+#### 2. 跨主机网络模式
+
+* Overlay技术 (libnetwork, libkv)
+  * 通过网络封包实现 —— 通过封包解包实现
+* Underlay
+  * 使用现有底层网络，为每一个容器配置可路由的网络IP (容器与主机网络共用，所以要有合理的网络规划 )
