@@ -47,6 +47,12 @@ Docker 通过隔离机制，可以尽可能利用服务器资源！
 
 **仓库（repository）：**存放镜像的地方
 
+
+
+![image-5](D:\work\blog\Article\DistributedSystem\CloudNative\docker\resource\image-5.png)
+
+
+
 #### 2.2 安装Docker
 
 系统环境Ubuntu Focal 20.04 (LTS)
@@ -333,3 +339,34 @@ docker logs -f -t --tail 10 <docker_id>
 > docker 还可以通过打同卷的方式同步数据  docker -v  
 >
 > `docker run -itd -v /test:/soft centos /bin/bash`
+
+
+
+##### 3.3.4 实战
+
+```shell
+(1) nginx
+
+docker run -d --name nginx01 -p 80:80 nginx
+
+# 测试
+curl locahost:80  
+
+whereis nginx
+
+vi /etc/nginx/nginx.connf
+
+docker run -it --rm nginx   # 运行完后，会删除容器， 一般用作测试
+
+(2) 多端口暴漏 elasticsearch
+
+docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e ES_JAVA_OPTS="-Xms64m -Xmx512m" elasticsearch:7.6.2
+
+# --net somenetwork 连接一个container网络,名字为somenetwork
+# -e 对docker环境变量的修改 等同与Dockerfile中的ENV
+
+docker stats  # 查看docker容器 cpu 状态
+```
+
+
+
