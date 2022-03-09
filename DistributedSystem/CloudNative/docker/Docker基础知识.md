@@ -366,6 +366,13 @@ docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=
 # -e 对docker环境变量的修改 等同与Dockerfile中的ENV
 
 docker stats  # 查看docker容器 cpu 状态
+
+(3) Docker Portainer 
+
+docker run -d -p 8088:9000 --restart=always -v /var/run/docker.sock:/var/run/docker.sock --privileged=true portainer/portainer
+
+# 验证安装
+http://${HOST_IP}:8088/
 ```
 
 
