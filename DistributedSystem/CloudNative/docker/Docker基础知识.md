@@ -12,7 +12,6 @@
 * *Docker镜像*
 * 容器数据卷
 * DockerFile
-* Docker容器原理
 * Docker网络原理
 * IDEA整合Docker
 * Docker Compose
@@ -108,14 +107,18 @@ netplan apply
 使用visudo编辑权限文件， 也可以用vi
 # 给用户添加sudo组
 su root       -切换到root用户组   (Ubuntu无密码下切换到root， sudo -i )
-# 打开sudoers添加sudo权限
+# 打开sudoers添加sudo权限，也可以使用vim
 visudo /etc/sudoers
 # 添加admin用户的权限
 %admin ALL=(ALL) ALL
-# 设置sudo无密码
+# 设置sudo无密码， 给所有用户添加sudo 权限
 %sudo ALL=(ALL:ALL) NOPASSWD:ALL
 
+
 改完后就会生效，不需要source去执行
+
+# 给用户添加不需要sudo便可以执行docker命令的的权限
+sudo chmod a+rw /var/run/docker.sock
 
 注：visudo 操作命令 crtl + x 退出 crtl + o 保存文件 enter 确认保存的文件 
 ```
@@ -169,6 +172,8 @@ docker ps -a  查看所有容器
 
 docker rmi -f 镜像id
 docker rm 容器id
+
+docker rm -f ${docker ps -aq}
 ```
 
 (5) 配置镜像仓库地址
@@ -178,7 +183,9 @@ sudo mkdir -p /etc/docker
 sudo touch daemon.json
 {
   "registry-mirrors": ["https://docker.mirrors.ustc.edu.cn"],
+  # insecure-registries 私有仓库
   "insecure-registries": ["host:prt"],
+  # docker 重启，container不停机
   "live-restore": true
 }
 
@@ -330,7 +337,7 @@ docker logs -f -t --tail 10 <docker_id>
 
 `docker inspect <docker_id>` 查询docker 容器中的元数据
 
-`docker cp /www/runoob <docker_id>:/www `  主机拷贝容器  
+`docker cp /www/runoob <docker_id>:/www `  主机拷贝容器 （不需要像linux一样加 -r） 
 
 `docker cp <docker_id>:/www /www/runoob  `  容器拷贝主机
 
@@ -376,4 +383,322 @@ http://${HOST_IP}:8088/
 ```
 
 
+
+# 4. Docker镜像
+
+> UnionFS（联合文件系统）
+
+是一种分层轻量级的文件系统，它支持文件系统分层叠加
+
+容器层和镜像层 docker run 是在镜像层叠加了容器命令层
+
+#### 4.1 docker 镜像制作
+
+```shell
+# 1. 通过docker cp 或者Dockerfile 启动修改镜像
+# 2. 通过对container 进行tag标记，或者commit
+
+# commit 镜像, 同git一样
+docker commit -a="author_name" -m="first commit docker images" <container_id> <TAG>
+
+# 打tag，和commit作用一样
+docker tag <containerId> <tagName>
+
+docker push/pull <tagName>
+```
+
+# 5. 容器数据卷
+
+容器数据卷，为了解决容器停止或者删除数据丢失的问题，通过挂载Linux等系统的文件目录，容器删除和停止都不会丢失，多个容器之间也可以通向数据。
+
+```shell
+# 命令挂载目录
+docker run  -v  本地目录:docker目录  容器
+
+# 查看容器元数据
+docker inspect <containerId>
+
+
+# 创建mysql数据库并映射
+
+docker run -d -p 3310:3306 -v /opt/mysql/conf:/etc/mysql/conf.d -v /opt/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --name mysql_mat mysql:5.8
+```
+
+![image-6](resource\image-6.png)
+
+
+
+#### 5.1 Docker 具名挂载、匿名挂载和指定路径挂载
+
+```shell
+# 具名挂载
+-v nginx:/etc/nginx # 指定了目录名，但没有指定主机位置
+
+# 匿名挂载
+-v /etc/nginx # 不指定容器外（主机的）挂载地址，会随机生成一个文件夹 
+
+# 指定路径挂载
+-v /opt/nginx:/etc/nginx
+
+# 挂载设置读写权限
+ro  # readOnly, 只能通过宿主机修改
+rw  # readWrite
+
+-v /opt/nginx:/etc/nginx:ro
+
+
+# 查看docker 容器卷的地址
+docker volume ls
+
+# 查看具体位置
+docker inspect <volume_id> # 元数据中的MountPoint， docker inspect 中的Source
+```
+
+
+
+#### 5.2 Dockerfile 脚本挂载
+
+```dockerfile
+FROM centos
+
+# 挂载目录---- 挂载了两个目录[匿名挂载]
+VOLUME ["volume01", "volume02"]
+
+CMD echo "----end----"
+CMD /bin/bash
+```
+
+`docker build -f <dockerfile_path> -t <tag>:<version>`
+
+
+
+#### 5.3 数据卷容器
+
+作用：--volumes-from 多个mysql数据同步， docker01 为数据卷容器
+
+![image-7](resource\image-7.png)
+
+只要有任何一个容器使用容器目录，其他的容器就算被删除，文件还会存在，容器卷是挂载在一起的。
+
+
+
+# 6. Dockerfile
+
+* Dockerfile 命令 （可参考 [Dockerfile最佳实践](Dockerfile的最佳实践.md) 文档）
+
+  ```dockerfile
+  FROM centos
+  MAINTAINER mat
+  
+  ENV MYPATH /usr/local
+  WORKDIR &MYPATH
+  
+  RUN apt-get update && apt-get install
+  RUN apt-get install vim
+  RUN apt-get install net-tools
+  
+  EXPOSE 80
+  
+  CMD echo $MYPATH
+  CMD echo "---end---"
+  CMD /bin/bash
+  ```
+
+  
+
+  ![image-8](resource\image-8.png)
+
+  ![image-9](resource\image-9.png)
+
+* docker build
+
+* docker history <contianer_id>  查看构建命令过程
+
+* docker push (推送到Dockerhub 或者 阿里云仓库)
+
+  * 登录阿里云
+  * 找到容器镜像服务
+  * 创建命名空间
+  * 创建镜像容器，点开后会有文档提示操作
+
+> 样例：安装 jdk+tomcat
+
+```dockerfile
+FROM centos
+
+COPY readme.text /usr/local/readme.txt
+
+ADD jdk-8u11-linux-x64.tar.gz  /usr/local
+ADD apache-tomcat-9.0.22.tar.gz  /usr/local
+
+RUN apt-get install vim
+
+ENV MYPATH /user/local
+WORKDIR &MYPATH
+
+ENV JAVA_HOME /usr/local/jdk1.8.0
+ENV CLASSPATH $JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+ENV CATALINA_HOME /usr/local/apache-tomcat-9.0.22
+ENV CATALINA_BASE /usr/local/apache-tomcat-9.0.22
+ENV PATH $PATH:$JAVA_HOME/bin:$CATALINA_HOME/lib:$CATALINA_HOME/bin
+
+EXPOSE 8080
+CMD /usr/local/apache-tomcat-9.0.22/bin/startup.sh && tail -F $CATALINA_HOME/bin/logs/catalina.out
+```
+
+
+
+# 7.Docker网络原理
+
+> 理解Docker0
+
+启动docker服务后，docker会在Linux系统中创建docker0 网卡，用来路由宿主机和容器、容器与容器之间的网络连接。
+
+每次启动一个容器，会发现创建了一个网卡，使用evth-pair技术，创建网卡成对出现 6-5、8-7
+
+![image-10](resource\image-10.png)
+
+```shell
+# docker网卡创建成对出现
+# evth-pair 技术，成对出现一端连着协议栈，一端彼此相连着（veth-pair 还不是很懂）
+
+# 容器之间ping
+docker exec -it docker01 ping xxx.xxx.xxx.xxx
+
+docker容器之间使用桥接， docker和物理网卡间是直连NAT
+
+NAT参考资料：https://www.zhihu.com/question/31332694
+```
+
+![image-11](resource\image-11.png)
+
+
+
+> 通过容器名字访问容器ip地址 --link
+
+```shell
+# --link 存在的问题
+docker network --help   # 查看所有网络命令
+docker network inpsect <network_id>
+
+# 使用名字docker02 可以ping通docker01 ，但反之不通
+docker run -it --name docker02 --link docker01 tomcat
+# --link 原理，实际是在host文件中加入例如docker01的映射
+```
+
+
+
+#### 7.1 Docker自定义网络
+
+> 查看docker网络 docker network ls
+>
+> 自定义网路好处： 不使用--link 可以通过container name 直接ping其他container
+
+网络模式：
+
+* bridge 桥接模式 (默认)
+* none 不配置网络
+* host 和宿主机共享网络
+* container 容器网络联通
+
+```shell
+# docker run 启动默认会 --net bridge，默认使用docker0,下面两条命令作用相同
+docker run -d -P --name docker01 tomcat
+docker run -d -P --name docker01 --net bride tomcat 
+
+
+# 创建网络
+docker network create --driver bridge --subnet 192.168.0.0/16 --gateway 192.168.0.1 mynet
+
+docker run -d -P --name docker01 --net mynet tomcat_mat
+docker run -d -P --name docker02 --net mynet tomcat_mat
+#测试 
+docker exec -it docker02 ping docker01
+```
+
+#### 7.2 多个网络之间，容器联通
+
+```shell
+# 连接一个网络 到容器
+docker network connect <network_id> <contianer_id>
+# 实际就是将 容器加入到 网络中，采用的是一个容器双网络口
+
+# 样例
+docker network connect mynet admiring_rhodes
+```
+
+![image-12](resource\image-12.png)
+
+
+
+# 8. 实战
+
+#### 8.1 Redis分片集群搭建
+
+##### 8.1.1 创建Redis集群配置文件
+
+```SHELL
+for port in $(seq 1 6); \
+do \
+mkdir -p redis/node-${port}/conf
+touch redis/node-${port}/conf/redis.conf
+cat > redis/node-${port}/conf/redis.conf << EOF 
+port 6379 
+bind 0.0.0.0
+cluster-enabled yes 
+cluster-config-file nodes.conf
+cluster-node-timeout 5000
+cluster-announce-ip 172.38.0.1${port}
+cluster-announce-port 6379
+cluster-announce-bus-port 16379
+appendonly yes
+EOF
+done
+```
+
+##### 8.1.2 启动容器构架集群
+
+```shell
+1. 启动6个redis容器
+
+docker run -p 637${port}:6379 -p 1637${port}:16379 --name redis-${port} \
+-v redis/node-${port}/data:/data \
+-v redis/node-${port}/conf/redis.conf:/etc/redis/redis.conf \
+-d --net redis --ip 172.38.0.1${port} redis:5.0.9 redis-server /etc/redis/redis.conf
+
+2. 构建集群
+
+# 进入容器内，执行命令
+redis-cli --cluster create 192.38.0.1${1}:6379 192.38.0.1${2}:6379 192.38.0.1${3}:6379 192.38.0.1${4}:6379 192.38.0.1${5}:6379 192.38.0.1${6}:6379 --cluster-replicas 1
+```
+
+
+
+
+
+##### 8.1.3 连接redis集群
+
+```shell
+# 进入容器内执行
+redis-cli  # 进入单机的redis
+redis-cli -c  # 进入集群的redis 连接
+
+# 进入redis集群
+>  cluster info # 查看集群信息
+>  cluster nodes # 查看节点信息
+>  set a b     # 可以看到进入那个slot
+>  get a       # 可以看到从那个slot取
+```
+
+
+
+#### 8.2 IDEA项目打包镜像
+
+```dockerfile
+FROM java:8
+COPY *.jar /app.jar
+CMD ["--server.port=8080"]
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/app.jar"]
+```
 

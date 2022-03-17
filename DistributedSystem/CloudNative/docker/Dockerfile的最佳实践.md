@@ -89,9 +89,19 @@ CMD ["--help"]
 >
 >   * 最常用的方法 `RUN apt-get update && apt-get install` , 两条命令应该永远用&&连接，如果分开执行，RUN apt-get update 构建层被缓存，构建镜像长时间后运行，可能会导致新的package无法安装（因为update缓存的apt-get 不是最新的）
 >
-> * CMD 容器镜像中应用的运行命令
+> * CMD 容器镜像中应用的运行命令, 在容器运行时，不能够直接追加参数
 >
 >   * CMD ["executable", "param1", "param2"]
+>
+>     ```shell
+>     例如:
+>     CMD ["ls", "-a"]  在docker运行时不能够直接使用docker run <image> <args> 
+>     必须 docker run <image> <command> <args> --- docker run <image> ls -al
+>     
+>     ENTRYPOINT["ls", "-a"]  在docker运行时可以直接追加参数docker run <image> <args> --- docker run <image> -l
+>     ```
+>
+>     
 >
 > * EXPOSE 发布端口
 >
@@ -148,11 +158,17 @@ CMD ["--help"]
 >
 > * USER 切换运行镜像的用户和用户组，因安全行要求，越来越多的场景要求容易应用要以non-root身份运行
 >   * USER <user>[:<group>]
+>   
 > * WORKDIR 等价cd 切换工作目录
+>
 > * ARG
+>
 > * ONBUILD
+>
 > * STOPSIGNAL
+>
 > * HEALTHCHECK
+>
 > * SHELL
 
 #### 4. dockerfile 最佳实践
