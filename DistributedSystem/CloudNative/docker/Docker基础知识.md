@@ -118,9 +118,39 @@ visudo /etc/sudoers
 改完后就会生效，不需要source去执行
 
 # 给用户添加不需要sudo便可以执行docker命令的的权限
+(1) 第一种修改docker.sock权限，重启后失效
 sudo chmod a+rw /var/run/docker.sock
+(2) docker运行在docker组，可以将当前用户添加到用户组
+id $USER   # 查看User基本信息
+sudo groupadd docker #添加docker用户组
+sudo gpasswd -a $USER docker #将登陆用户加入到docker用户组中
+usermod -a -G docker $USER  #将登陆用户加入到docker用户组中
+newgrp docker #更新用户组
 
 注：visudo 操作命令 crtl + x 退出 crtl + o 保存文件 enter 确认保存的文件 
+```
+
+（6）Ubuntu 网络不通之 DNS错误
+
+> 在Ubuntu 中即便使用正确的网络配置，当你的系统同时存在多个网络时，会出现DNS错误，导致网络连接错误。
+
+**修改方法**
+
+```yaml
+# 修改netplan网络
+
+network:
+  ethernets:
+    enp0s3:
+      nameservers:
+        addresses:
+          - 8.8.8.8
+      dhcp4: true
+    enp0s8:
+      dhcp4: no
+      addresses:
+        - 192.168.56.100/24
+  version: 2
 ```
 
 
@@ -548,7 +578,7 @@ CMD /usr/local/apache-tomcat-9.0.22/bin/startup.sh && tail -F $CATALINA_HOME/bin
 
 
 
-# 7.Docker网络原理
+# 7. Docker网络原理
 
 > 理解Docker0
 
@@ -701,4 +731,84 @@ CMD ["--server.port=8080"]
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app.jar"]
 ```
+
+
+
+# 9. Docker Compose
+
+Docker Compose 是用来定义和运行多个容器，Docker Compose 运行的三个基本环节：
+
+- 定义运行程序的Dockerfile 环境及文件
+- 运用docker-compose.yml文件来定义一组服务，服务都运行在隔离的环境中
+- 通过 `docker-compose up`  运行
+  - docker-compse down
+
+核心作用: 批量容器编排，属于单服务器编排多个容器
+
+
+
+#### 9.1 Docker Compose  安装
+
+* 下载docker-compose执行文件
+  * 国内地址`curl -L https://get.daocloud.io/docker/compose/releases/download/1.29.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose`
+* 修改执行权限 `sudo chmod +x /usr/local/bin/docker-compose`
+* `docker-compose version`
+
+
+
+#### 9.2 Docker Compose 使用
+
+```yaml
+version: "3.9"
+services:
+  web:
+    build: .
+    ports:
+      - "8000:5000"
+  redis:
+    image: "redis:alpine"
+```
+
+启动compose服务`docker-compose up`
+
+`docker-compose down`
+
+默认服务名: 文件名\_服务名\_副本数
+
+网络默认名: 文件名\_default   网络中通过域名访问
+
+
+
+#### 9.3 yaml文件
+
+>  docker-compse 文件核心三大块，配置参数参考https://docs.docker.com/compose/compose-file/compose-file-v3/
+
+```yaml
+version: '' #版本
+services： # 服务同Dockerfile一样
+	服务1: name
+		images
+		build
+		network
+		...
+	服务2: name
+		...
+# 其他配置
+networks:
+volumes:
+```
+
+* depend_on 依赖启动当前服务时先要启动好的服务（启动优先级）
+
+
+
+# 10. Docker Swarm
+
+Docker Swarm 属于集群使用 Docker Compose 运行Docker
+
+
+
+
+
+
 

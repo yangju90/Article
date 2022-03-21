@@ -97,7 +97,7 @@ CMD ["--help"]
 >     例如:
 >     CMD ["ls", "-a"]  在docker运行时不能够直接使用docker run <image> <args> 
 >     必须 docker run <image> <command> <args> --- docker run <image> ls -al
->     
+>         
 >     ENTRYPOINT["ls", "-a"]  在docker运行时可以直接追加参数docker run <image> <args> --- docker run <image> -l
 >     ```
 >
