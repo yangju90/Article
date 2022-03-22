@@ -16,7 +16,6 @@
 * IDEA整合Docker
 * Docker Compose
 * Docker Swarm
-* CI/CD Jenkins (gitlab)
 
 [toc]
 
@@ -167,6 +166,9 @@ network:
 | apt purge  | 会同时清除软件包和软件的配置文件 |
 
 ```shell
+# 修改apt-get源
+vim /etc/apt/sources.list
+
 # 卸载软件 
 sudo apt-get purge docker-ce docker-ce-cli containerd.io
 
@@ -769,7 +771,7 @@ services:
     image: "redis:alpine"
 ```
 
-启动compose服务`docker-compose up`
+启动compose服务`docker-compose up -d`
 
 `docker-compose down`
 
@@ -777,7 +779,7 @@ services:
 
 网络默认名: 文件名\_default   网络中通过域名访问
 
-
+`docker-compose up --build` 重新编译docker-compose 并运行
 
 #### 9.3 yaml文件
 
@@ -802,13 +804,74 @@ volumes:
 
 
 
+样例：https://docs.docker.com/samples/wordpress/
+
+
+
 # 10. Docker Swarm
 
 Docker Swarm 属于集群使用 Docker Compose 运行Docker
 
+* 初始化集群`docker swarm init --advertise-addr ${public_ip}  `
+* 加入初始化的集群以work `docker swarm join --token ${token} ${public_ip}:2377 `
+
+* 使用`docker swarm join-token manager`命令生成 加入节点的命令，然后再客户机连接，加入成功变为manager节点
+
+`sytemctl stop docker` 测试集群情况
 
 
 
+#### 10.1 docker service
+
+管理节点运行命令
+
+* 创建服务
+  * docker service create -p 8080:80 --name my-nginx nginx
+  * docker  service  ls
+  * docker service update --replicas 3 my-nginx  #扩缩容
+  * docker service scale my-nginx=3   #扩缩容
+* 动态扩展服务
+* 更新服务
 
 
+
+#### 10.2 docker swarm 命令
+
+输入命令 ——> 管理 ——> api ——> 调度 ——> 工作节点
+
+
+
+```shell
+# service运行模式
+
+--mode string Service mode (replicated, global, replicated-job, or global-job) (default "replicated")
+
+replicated 模式，代表副本模式，global代表每个node都有
+
+docker service create --mode replicated --name my-nginx nginx:7
+
+docker service create --mode global --name my-nginx nginx
+```
+
+
+
+```shell
+# 单机
+docker-compose up -d xxx.yaml
+
+# 集群
+docker stack deploy xxx.yaml
+
+# docker stack 配置文件
+```
+
+
+
+```shell
+# docker 证书
+docker secret
+
+# docker config 配置
+docker config
+```
 
