@@ -164,6 +164,10 @@ kubenetes集群中运行的Pod提供账户标识， 和namespace相关
 
 
 
+
+
+
+
 # 6. Service
 
 #### 6.1 Service命令
