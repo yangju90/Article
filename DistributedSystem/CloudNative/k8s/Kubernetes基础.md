@@ -67,6 +67,7 @@ https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-ku
 ##### 4.2.1 kubectl 工具常用命令
 
 - `kubectl describe` kubctl 最终要的工具，查看目标状态及Event
+- `kubeclt delete ` kubectl 重要的删除命令
 - `kubectl get node -oyaml <node-name> ` 查看node-name节点的信息
 - `kubectl get pod -owide` 查看pod信息，以wide形式展示
 - `kubectl get pod -l component=etcd -n kube-system` 节点过滤
@@ -112,6 +113,9 @@ kubectl delete deployment <deployment名> -n <namespace>
 
 # 删除pod
 kubectl delete pod <podname> -n <namespace>
+
+# yaml 删除
+kubectl delete -f xxx.yaml
 
 ```
 
