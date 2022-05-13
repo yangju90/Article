@@ -1,4 +1,4 @@
-<div align=center><font face="黑体" size=6>Kubernetes常见问题及解决(一)</font></div>
+<div align=center><font face="黑体" size=6>Kubernetes常见问题及解决</font></div>
 
 [toc]
 
@@ -161,53 +161,4 @@ systemctl restart containerd
 ```
 
 
-
-#### 1.5 kubectl logs 、exec、port-forward 执行失败问题解决
-
-##### 1.5.1 问题
-
-在`master`节点上执行`kubectl logs、 exec、port-forward`等命令，目标pod在slave节点，出现如下错误：
-
-![QA-5-1](resources\QA-5-1.png)
-
-执行任何pod操作或者查看属于pod的子资源，都会显示`pod`不存在。
-
-##### 1.5.2 原因
-
-原因是因为，虚拟化出了3台 ubuntu 主机搭建的 k8s。在组⽹的过程中，采⽤了双⽹卡VirtualBox⽅案，⽹卡1使⽤NAT地址转换⽤来访问互联⽹，⽹卡2使⽤来实现虚拟机互相访问。⽽ k8s 默认使⽤了⽹卡1的 ip 地址，这就导致了Host-only⼯作节点的 ip 地址使⽤的是⽹卡1的 NAT 地址转换地址(不可以访问其他虚拟机)，从⽽导致的问题的产⽣。
-
-
-
-检查确认原因：
-
-执行命令`kubectl logs httpserver-68f9d4cdd6-fml4k -v 9`
-
-![QA-5-2](resources\QA-5-2.png)
-
-从输出图中可以看到，`kubectl`先去访问了本机的`apiserver`来获取⽬标`pod`的信息（红色框1，本机IP为192.168.56.201），返回结果正常，但是进⼀步去请求`pod`的`log`资源的时候就出现了 404 的情况（红框2），仔细查看`pod`的信息时，可以发现它的`hostIP`居然是` NAT `地址转换模式的默认地址
-为`10.0.2.15 `!（蓝框） 
-
-##### 1.5.3 解决
-
-因为这个地址是⼯作节点上的`kubelet`⾃动⽣成并发给管理节点的，所以现在我们要登录⼯作节点，然后⼿动指定他的 ip 地址：
-
-在 kubelet 启动时指定 ip，修改⽂件 `/etc/systemd/system/kubelet.service.d/10-kubeadm.conf`
-
-然后添加在`ExecStart`⾏之前新增⼀⾏，内容为：`Environment="KUBELET_EXTRA_ARGS=--node-ip=192.168.56.21"`，注意！这个 ip 地址要填写你当前节点的 ip 地址，这个 ip 是可以正常访问管理节点的⽹卡 ip，如下：
-
-![QA-5-3](resources\QA-5-3.png)
-
-
-
-重启kubelet
-
-```shell
-systemctl stop kubelet.service
-systemctl daemon-reload
-systemctl start kubelet.service
-```
-
-
-
-重启完成后，主节点就可正常访问pod了。
 
