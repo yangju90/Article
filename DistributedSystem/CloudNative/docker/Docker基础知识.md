@@ -27,7 +27,7 @@
 
 Docker 开发、打包、部署、上线，一套流程做完
 
-![image-1](/resource/image-1.png)
+![image-1](resource/image-1.png)
 
 Docker 通过隔离机制，可以尽可能利用服务器资源！
 
@@ -37,7 +37,7 @@ Docker 通过隔离机制，可以尽可能利用服务器资源！
 
 #### 2.1 Docker的基本组成
 
-![image-2](/resource/image-2.jpg)
+![image-2](resource/image-2.jpg)
 
 **镜像（image）：**可以创建容器服务
 
@@ -47,7 +47,7 @@ Docker 通过隔离机制，可以尽可能利用服务器资源！
 
 
 
-![image-5](/resource/image-5.png)
+![image-5](resource/image-5.png)
 
 
 
