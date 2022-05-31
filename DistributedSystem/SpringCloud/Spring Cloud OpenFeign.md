@@ -68,3 +68,32 @@ feign:
   okhttp:
     enabled: true
 ```
+##### 1.3 fegin 请求异常处理
+<font color=red><b>ErrorDecoder</b></font>
+
+```java
+@Component
+public class FeignDecoder implements ErrorDecoder {
+
+    private static final Logger logger = LoggerFactory.getLogger(FeignDecoder.class);
+
+    @Override
+    public Exception decode(String s, Response response) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append("message: " + "Response status" + response.status() +", ");
+            sb.append("url: " + response.request().url() +", ");
+            byte[] messageByte =response.body().asInputStream().readAllBytes();
+            String message = new String(messageByte,"UTF-8");
+            sb.append("body: " + message +". ");
+            return new BusinessException(sb.toString());
+        } catch (Exception e) {
+            if(e instanceof  BusinessException){
+                return e;
+            }else{
+                return new BusinessException("feign client request error ", e);
+            }
+        }
+    }
+}
+```
