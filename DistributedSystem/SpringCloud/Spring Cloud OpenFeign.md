@@ -25,7 +25,7 @@ feign:
   client:
     config:
       default:
-        connectTimeout: 10000
+        connectTimeout: 10000   # 超时时间connectTimeout和ReadTimeout需要同时开启
         readTimeout: 10000
 ```
 ###### 1.1.3 FeignConfig类文件
