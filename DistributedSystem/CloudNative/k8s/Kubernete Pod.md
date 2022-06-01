@@ -138,9 +138,9 @@ Service引入了topologyKeys属性，可以控制流量。[查询官网，版本
 
 
 
-# 3. Pod 网络调用关系
+# 3. Pod 网络
 
-<font color=red><b>核心kube-proxy：</b></font>每台机器都会运行一个kube-proxy服务，他监听ApiServer中 service和endpoint的变化，并通过iptables等来为服务器配置负载均衡（仅支持TCP和UDP）,支 持的几种实现：
+<font color=red><b>核心kube-proxy：</b></font>每台机器都会运行一个kube-proxy服务，他监听ApiServer中 service和endpoint的变化，并通过iptables等来为服务器配置负载均衡（仅支持TCP和UDP），支持的几种实现（L4层，基于五元组 IP、Port 和协议）：
 
 * userspace：监听端口，所有服务转发到服务端口，在其内部负载均衡到实际Pod，（用户态性能瓶颈）
 * iptables：目前推荐的方式 
@@ -150,3 +150,123 @@ Service引入了topologyKeys属性，可以控制流量。[查询官网，版本
 > Netfilter框架，Linux网络内核框架
 
 ![image-3-1](resources\pod-3-1.png)
+
+#### 3.1 iptables 指令
+
+* `iptables -L` 查看iptables配置的调用规则
+
+* `iptables -L -t nat`   查看iptables配置的调用规则，与nat相关的
+
+* `iptables-save -t nat`   将iptables nat相关的规则dump出来，查看
+
+> iptables 存在的问题：
+>
+> * 规则复杂，不容易阅读，规则太过复杂
+> * 负载均衡算法粗暴（全由几率去判断），不够智能，转发效率差
+> * iptables 刷新，不能够增量，必须全量替换，这样导致k8s集群规模受限，太多影响效率
+> * svc 生成的Ip没有具体设备响应ping不通，必须使用curl 调用（真实的数据包，通过内核使用dnat匹配转换地址）
+
+
+
+#### 3.2 ipvs 
+
+`ipvs` 是Netfilter的另外一种工作模式，LVS中间的一部分，两者几乎等同。`Linux virtual server (LVS)`  更多的为负载均衡服务，ipvs 与 iptables hook 点是不同的，ipvs 主要在`LOCAL_IN` `LOCAL_OUT`，添加规则。如下图 iptables和 ipvs ：
+
+![image-3-2](resources\pod-3-2.png)
+
+![image-3-3](resources\pod-3-3.png)
+
+* `ipvs` 不同于`iptables`，没有`PREROUTING`的规则
+* `ipvs` 的规则下发点在`LOCAL_IN`和 `LOCAL_OUT`做nat转换， 因此使用`ipvs`需要将ClusterIp 绑定在当前设备的一个Dummy 设备上
+
+##### 3.2.1 iptables 切换 ipvs 模式
+
+* 编辑kube-proxy 的configmap， `kubectl edit configmap kube-proxy -n -kube-system`  set mode："ipvs"
+* 删除节点上的kube-proxy pod，重启后会注册虚拟网卡kube-ipvs0
+* iptables --flush
+
+##### 3.2.2 ipvs 命令
+
+* 安装ipvsadm
+* `ipvsadm -L -n` 查看ipvs nat 转换
+
+`ipvs` 模式会在本地创建一个kube-ipvs0 的虚拟网卡，上面绑定了ClusterIp地址，所以在集群内部可以ping，易读性非常好，且对负载均衡进行了增强（支持权重、轮询等）
+
+#### 3.3 CoreDNS
+
+CoreDNS 包含一个内存态DNS，以及与其他controller类似的控制器。
+
+CoreDNS 的实现原理是，控制器监听Service 和 EndPoint 的变化并配置DNS，客户端Pod在进行域名解析时，从CoreDNS中查询服务对应的地址记录。
+
+> CoreDNS 中的映射信息并不是落盘存储，而是通过启动时CoreDNS中的Controller扫描集群中的Service和EndPoints 得来，域名通用 svc1.ns1.svc.clusterdomain:VIP1 (默认culsterdomain = cluster.local)
+
+
+
+##### 3.3.1 Pod 利用CoreDNS 解析域名
+
+* Pod DNS Policy未指定，默认为ClusterFirst， 会创建 /etc/resolv.conf
+* resolv 文件会指定nameserver 指向kube-dns
+
+```shell
+/etc # cat resolv.conf 
+# 短名的补全列表
+search default.svc.cluster.local svc.cluster.local cluster.local
+# coredns svc 地址
+nameserver 10.1.0.10
+# 短名配置，dots数为5的情况下认为短名，短名会按照search提供的后缀，进行补全
+options ndots:5
+```
+
+不同类型服务的DNS记录额，分为 Service、Headless Service 、ExternalName Service
+
+##### 3.3.2 Pod 利用env 解析域名
+
+Pod中的env 查看，可以利用`kubectl exec -it  <pod-name> bin/sh` 进入pod中，env 查看环境变量配置。
+
+Pod中环境变量的Service信息，是在Pod启动时会将namespace下的service以命令的方式写入，这也也存在Service过多pod启动失败，原因是命令过程被截断。
+
+`spec.enableServiceLinks: true/false`控制着是否环境变量加载Service服务域名信息。
+
+##### 3.3.3 自定义DNSPolicy
+
+```yaml
+spec: 
+	dnsPolicy: "None"
+	dnsConfig:
+		nameservices:
+			- ip
+		searchs: 
+			- xx.ns1.svc.cluster.local
+			- xx.daemon.com
+		options:
+			- name: ndots
+			  values: "2"
+```
+
+
+
+#### 3.4 Ingress 七层网络
+
+* 基于七层应用层，提供更多功能
+* URL/http header 
+* L7 path forwarding
+* TLS termination （传输安全）
+
+##### 3.4.1 L4 与L7层服务的对比
+
+| L4层服务                                   | L7层服务                                      |
+| ------------------------------------------ | --------------------------------------------- |
+| 每个Service应用独占ELB(企业负载均衡)       | 多个Service应用可以共享ELB                    |
+| 服务创建会频繁更新DNS                      | 服务创建共享一个Domain                        |
+| 支持TCP\UDP，启动https服务需要自己管理证书 | TLS termination 发生在Ingress层，可以几种管理 |
+|                                            | 更多的高级功能Gateway                         |
+
+##### 3.4.2 Ingress
+
+Kubernetes Ingress Spec 时转发规则的集合，Ingress Controller 来确保 负载均衡配置、边缘路由配置和DNS配置。
+
+> Ingress 相对与L4 层的功能有了一定的丰富，但对与L7层的流量代理来说，还有很多功能的缺乏，例如： 安全（算法）、基于header 的转发规则、rewriting（header rewriting、Uri rewriting）等，都不能支持，Istio 作为Kubernetes 官方Service Provider提供了一种很好的实现。
+
+
+
+虚拟路由与硬件路由直接可以通过BGP协议，完成路由信息的同步。
