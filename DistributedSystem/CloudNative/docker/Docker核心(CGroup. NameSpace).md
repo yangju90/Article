@@ -15,7 +15,7 @@
 
 #### 1. 概述
 
-cgroups全称 Control Group 是linux系统内核中资源控制的工具， 可以对CPU、内存、磁盘I/O、网络等进程所需的资源进行限制。
+cgroups全称 Control Group 是linux系统内核中资源控制的工具， 可以对CPU、内存、磁盘I/O、网络等进程所需的资源量进行限制。
 
 
 
