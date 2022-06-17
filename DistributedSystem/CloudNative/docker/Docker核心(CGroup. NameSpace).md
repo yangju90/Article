@@ -32,6 +32,17 @@ Namespace 是一种隔离机制， 主要目的是隔离运行在同一个宿主
 * 充分利用系统的资源，可以在同一台宿主机上运行多个容器
 * 保证了安全性，不同容器之间不能互相访问
 
+
+|       分类        |               隔离内容               |
+| :---------------: | :----------------------------------: |
+|  Mount namespace  |             Mount points             |
+|   UTS namespace   |     Hostname and NIS domain name     |
+|   IPC namespace   |  System V IPC, POSIX message queues  |
+|   PID namespace   |              Process ID              |
+| Network namespace | Network devices, stacks, ports, etc. |
+|  User namespace   |          User and group ID           |
+
+
 #### 3. 命令操作
 
 ##### 3.1 基本命令
