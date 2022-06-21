@@ -68,6 +68,14 @@ persistence: false
 
 ##### 2.1.2 Harbor可视化使用
 
+1.登录Harbor页面
+
+网址：`https://192.168.56.201:30003`
+
+账号：`admin/Harbor12345`
+
+![harbor-2.2](resources\harbor-2.2.png)
+
 
 
 
