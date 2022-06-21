@@ -137,8 +137,9 @@ Halo的安装步骤：
    // 生成证书，手动配置
    sudo certbot certonly --nginx
    
-   // 证书自动申请续时间
-   sudo certbot renew --dry-run
+   // 证书自动申请续时间，测试申请
+   sudo certbot renew --dry-run  
+   
    
    // 续订证书文件配置位置（三者之一）
    /etc/crontab/
