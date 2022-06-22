@@ -76,9 +76,73 @@ persistence: false
 
 ![harbor-2.2](resources\harbor-2.2.png)
 
+2.配置hosts
 
+配置`harbor NodePort ClusterIP`到hosts文件中`vim /etc/hosts`
 
+```shell
+10.1.83.18 core.harbor.domain
 
+# curl 有html数据返回
+curl https://core.harbor.domain -k 
+```
+
+3.安装nerdctl
+
+`curl -OL https://github.com/containerd/nerdctl/releases/download/v0.21.0/nerdctl-0.21.0-linux-amd64.tar.gz   `
+
+> 当出现 <font color=red>curl: (56) OpenSSL SSL_read: Connection reset by peer, errno 104</font>  注意添加-L
+
+```shell
+mkdir nerd
+sudo tar -zxvf nerdctl-0.21.0-linux-amd64.tar.gz -C /usr/local/bin
+```
+
+4.Containerd配置ca.crt
+
+从harbor中下载ca.crt：`https://192.168.34.2:30003/harbor/projects/1/repositories`
+
+参考contianerd文档：https://github.com/containerd/containerd/blob/main/docs/hosts.md
+
+```shell
+mkdir /etc/containerd/certs.d/core.harbor.domain
+copy the ca.crt to this folder
+systemctl restart containerd
+```
+
+修改containerd的配置文件config.toml
+
+```shell
+version = 2
+
+[plugins."io.containerd.grpc.v1.cri".registry]
+   config_path = "/etc/containerd/certs.d"
+```
+
+重启contianerd， `systemctl restart containderd` 
+
+5.推送Image到Harbor
+
+```shell
+sudo nerdctl login -u admin -p Harbor12345 core.harbor.domain
+
+# 提示错误failed to call rh.Client.Do: Get "https://core.harbor.domain/v2/": x509: certificate signed by unknown authority 
+# 返回第4步配置ca.crt
+```
+
+推送镜像：
+
+```shell
+sudo nerdctl images --namespace k8s.io
+
+# 创建镜像Tag
+sudo nerdctl tag xxx core.harbor.domain/library/httpserver:v0.1.0 --namespace k8s.io
+
+# 推送镜像到harbor
+sudo nerdctl push core.harbor.domain/library/httpserver:v0.1.0 --namespace k8s.io
+```
+
+Harbor 的搭建至此完成，可以通过core.harbor.domain 下载镜像
 
 # 3. 镜像安全
 
