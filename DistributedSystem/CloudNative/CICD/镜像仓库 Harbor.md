@@ -110,7 +110,9 @@ copy the ca.crt to this folder
 systemctl restart containerd
 ```
 
-修改containerd的配置文件config.toml
+~~修改containerd的配置文件config.toml~~ (<font color=red>注：1.5.9 版本不能添加certs的config_path， 否则会出现 Kubelet不能启动问题，这个步骤可以省略</font>)
+
+错误信息：<font color=red>`"Version from runtime service failed" err="rpc error: code = Unimplemented desc = unknown service runtime.v1alpha2.RuntimeService"`</font>
 
 ```shell
 version = 2
@@ -172,5 +174,10 @@ Harbor 的搭建至此完成，可以通过core.harbor.domain 下载镜像
 
 ##### 3.4.1 Clair 启用
 
+// todo
 
+##### 3.4.2 Trivy启用
 
+Harbor helm 安装会默认有Trivy，启用 Trivy 前台仓库配置即可。
+
+![harbor-3.2](resources\harbor-3.2.png)
