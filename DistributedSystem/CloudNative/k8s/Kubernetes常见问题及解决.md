@@ -157,6 +157,7 @@ sandbox_image = "k8s.gcr.io/pause:3.5"
 # 改为
 sandbox_image = "registry.aliyuncs.com/google_containers/pause:3.6"
 
+systemctl daemon-reload
 systemctl restart containerd
 ```
 
@@ -210,4 +211,21 @@ systemctl start kubelet.service
 
 
 重启完成后，主节点就可正常访问pod了。
+
+# 2.kubenetes 操作运维
+
+#### 2.1 k8s 批量清楚Evict的Pod的记录
+
+```shell
+kubectl -n ${ns}  get pods | grep Evicted |awk '{print$1}'|xargs kubectl -n ${ns} delete pods
+
+kubectl get pods --all-namespaces -o wide | grep Evicted | awk '{print $1,$2}' | xargs -L1 kubectl delete pod -n
+```
+
+#### 2.2 K8s 清楚Pod占用的磁盘
+
+```shell
+# 查看磁盘占用
+sudo du -h --max-depth=1
+```
 
