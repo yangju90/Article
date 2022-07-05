@@ -41,4 +41,4 @@ spec:
   type: NodePort
 ```
 
-#### 1.2 安装
+#### 1.2 安装 gitlab-runner
