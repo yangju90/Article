@@ -212,6 +212,65 @@ systemctl start kubelet.service
 
 重启完成后，主节点就可正常访问pod了。
 
+
+
+#### 1.6 kubeadm join 双网卡添加到集群，Network interface 切换
+
+##### 1.6.1 问题
+
+使用Kubeadm添加新的节点到集群，新节点是双网卡，网卡ip如下：
+
+```shell
+node4@node4-VirtualBox:/etc/systemd/system/kubelet.service.d$ ip addr
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:5e:43:d7 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic enp0s3
+       valid_lft 84287sec preferred_lft 84287sec
+    inet6 fe80::a00:27ff:fe5e:43d7/64 scope link 
+       valid_lft forever preferred_lft forever
+3: enp0s8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:b8:d3:a0 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.56.204/24 brd 192.168.56.255 scope global enp0s8
+       valid_lft forever preferred_lft forever
+    inet6 fe80::a00:27ff:feb8:d3a0/64 scope link 
+       valid_lft forever preferred_lft forever
+```
+
+目标是想采用网卡`enp0s8` 作为集群内部的沟通网络，但是加入集群后，结果如下：
+
+![QA-6-1](resources\QA-6-1.png)
+
+##### 1.6.2 原因
+
+`Kubeadm join` 加入集群时，默认网卡选择错误，查看kubeadm join 日志可知 默认的 Network Interface 选择错误， 所以需要解决Kubelet的默认网卡，详见issue ： https://github.com/kubernetes/kubernetes/issues/33618
+
+##### 1.6.3 解决
+
+修改 `sudo vim 10-kubeadm.conf` 文件
+
+![QA-6-2](resources\QA-6-2.png)
+
+重置节点：
+
+```shell
+sudo kubeadm reset
+sudo ipvsadm --clear
+# 重新加入集群
+kubeadm join ....
+```
+
+
+
+> 修改Calico 网卡，spec 中修改
+
+
+
 # 2.kubenetes 操作运维
 
 #### 2.1 k8s 批量清楚Evict的Pod的记录
