@@ -21,10 +21,29 @@ spec:
       labels:
         run: gitlab
     spec:
+      # nodeSelector保证pod 运维到指定label节点
+      nodeSelector:
+        indi.mat.gitlab: gitlab
+      # emptyDir 保证 pod 异常关闭停止，数据还在（如果不配置，每次重启集群，gitlab用户数据丢失）
+      volumes:
+      - name: v-data
+        emptyDir: {}
+      - name: v-opt
+        emptyDir: {}
+      - name: v-opt
+        emptyDir: {}
       containers:
       - image: gitlab/gitlab-ee
         imagePullPolicy: IfNotPresent
         name: gitlab
+        volumeMounts:
+        - mountPath: /var/opt/gitlab
+          name: v-data
+        - mouuntPath: /var/log/gitlab
+          name: v-log
+        - mountPath: /etc/gitlab
+          name: v-opt
+        
 ---
 apiVersion: v1
 kind: Service
@@ -40,5 +59,7 @@ spec:
     run: gitlab
   type: NodePort
 ```
+
+
 
 #### 1.2 安装 gitlab-runner

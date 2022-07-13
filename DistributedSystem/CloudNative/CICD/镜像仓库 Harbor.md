@@ -66,7 +66,153 @@ persistence: false
 
 `helm install harbor ./harbor -n harbor`
 
-##### 2.1.2 Harbor可视化使用
+##### 2.1.2 Harbor Helm持久化
+
+1.添加hostpath
+
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: registry-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: registry-manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data/registry"
+---    
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: chartmuseum-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: chartmuseum-manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data/chartmuseum"
+---    
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jobservice-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: jobservice-manual
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data/jobservice"
+---    
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: database-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: database-manual
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data/database"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: redis-manual
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data/redis"
+---    
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: trivy-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: trivy-manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data/trivy"
+```
+
+
+
+2.values.yaml 文件修改
+
+```yaml
+# 持久化存储配置部分
+persistence:
+  enabled: true   # 开启持久化存储
+  resourcePolicy: "keep"
+  persistentVolumeClaim:        # 定义Harbor各个组件的PVC持久卷部分
+    registry:          # registry组件（持久卷）配置部分
+      existingClaim: ""
+    storageClass: "registry-manual"           # 前面创建的StorageClass，其它组件同样配置
+      subPath: ""
+      accessMode: ReadWriteMany          # 卷的访问模式，需要修改为ReadWriteMany，允许多个组件读写，否则有的组件无法读取其它组件的数据
+      size: 10Gi
+    chartmuseum:     # chartmuseum组件（持久卷）配置部分
+      existingClaim: ""
+      storageClass: "chartmuseum-manual"
+      subPath: ""
+      accessMode: ReadWriteMany
+      size: 10Gi
+    jobservice:    # 异步任务组件（持久卷）配置部分
+      existingClaim: ""
+      storageClass: "jobservice-manual"    #修改，同上
+      subPath: ""
+      accessMode: ReadWriteOnce
+      size: 2Gi
+    database:        # PostgreSQl数据库组件（持久卷）配置部分
+      existingClaim: ""
+      storageClass: "database-manual"
+      subPath: ""
+      accessMode: ReadWriteMany
+      size: 2Gi
+    redis:    # Redis缓存组件（持久卷）配置部分
+      existingClaim: ""
+      storageClass: "redis-manual"
+      subPath: ""
+      accessMode: ReadWriteMany
+      size: 2Gi
+    trivy:         # Trity漏洞扫描插件（持久卷）配置部分
+      existingClaim: ""
+      storageClass: "trivy-manual"
+      subPath: ""
+      accessMode: ReadWriteMany
+      size: 10Gi
+```
+
+
+
+##### 2.1.3 Harbor可视化使用
 
 1.登录Harbor页面
 
