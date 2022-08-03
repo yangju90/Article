@@ -62,4 +62,36 @@ spec:
 
 
 
-#### 1.2 安装 gitlab-runner
+#### 1.2 Helm安装 gitlab-runner
+
+##### 1.2.1 Helm 下载 gitlab-runner 配置
+
+```shell
+helm repo add gitlab https://charts.gitlab.io
+
+helm pull gitlab/gitlab-runner
+```
+
+##### 1.2.2 修改配置文件
+
+* gitlabUrl: gitlab host
+* runnerRegistrationToken: 在gitlab CI/CD中查找
+
+* 权限配置Rbac
+
+
+
+##### 1.2.3 安装卸载
+
+* 安装
+
+```shell
+helm install gitlab-runner ./gitlab-runner -n gitlab-runner
+```
+
+* 卸载
+
+```shell
+helm uninstall gitlab-runner -n gitlab-runner
+```
+

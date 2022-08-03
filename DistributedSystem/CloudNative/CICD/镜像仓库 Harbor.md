@@ -68,7 +68,7 @@ persistence: false
 
 ##### 2.1.2 Harbor Helm持久化
 
-1.添加hostpath
+1.添加hostpath (特别要注意pod有没有写入权限，否则不能正常启动)
 
 ```yaml
 apiVersion: v1
@@ -80,7 +80,7 @@ metadata:
 spec:
   storageClassName: registry-manual
   capacity:
-    storage: 10Gi
+    storage: 5Gi
   accessModes:
     - ReadWriteMany
   hostPath:
@@ -95,7 +95,7 @@ metadata:
 spec:
   storageClassName: chartmuseum-manual
   capacity:
-    storage: 10Gi
+    storage: 5Gi
   accessModes:
     - ReadWriteMany
   hostPath:
@@ -110,7 +110,7 @@ metadata:
 spec:
   storageClassName: jobservice-manual
   capacity:
-    storage: 2Gi
+    storage: 1Gi
   accessModes:
     - ReadWriteMany
   hostPath:
@@ -125,7 +125,7 @@ metadata:
 spec:
   storageClassName: database-manual
   capacity:
-    storage: 2Gi
+    storage: 1Gi
   accessModes:
     - ReadWriteMany
   hostPath:
@@ -140,7 +140,7 @@ metadata:
 spec:
   storageClassName: redis-manual
   capacity:
-    storage: 2Gi
+    storage: 1Gi
   accessModes:
     - ReadWriteMany
   hostPath:
@@ -155,7 +155,7 @@ metadata:
 spec:
   storageClassName: trivy-manual
   capacity:
-    storage: 10Gi
+    storage: 5Gi
   accessModes:
     - ReadWriteMany
   hostPath:
@@ -177,37 +177,37 @@ persistence:
     storageClass: "registry-manual"           # 前面创建的StorageClass，其它组件同样配置
       subPath: ""
       accessMode: ReadWriteMany          # 卷的访问模式，需要修改为ReadWriteMany，允许多个组件读写，否则有的组件无法读取其它组件的数据
-      size: 10Gi
+      size: 5Gi
     chartmuseum:     # chartmuseum组件（持久卷）配置部分
       existingClaim: ""
       storageClass: "chartmuseum-manual"
       subPath: ""
       accessMode: ReadWriteMany
-      size: 10Gi
+      size: 5Gi
     jobservice:    # 异步任务组件（持久卷）配置部分
       existingClaim: ""
       storageClass: "jobservice-manual"    #修改，同上
       subPath: ""
       accessMode: ReadWriteOnce
-      size: 2Gi
+      size: 1Gi
     database:        # PostgreSQl数据库组件（持久卷）配置部分
       existingClaim: ""
       storageClass: "database-manual"
       subPath: ""
       accessMode: ReadWriteMany
-      size: 2Gi
+      size: 1Gi
     redis:    # Redis缓存组件（持久卷）配置部分
       existingClaim: ""
       storageClass: "redis-manual"
       subPath: ""
       accessMode: ReadWriteMany
-      size: 2Gi
+      size: 1Gi
     trivy:         # Trity漏洞扫描插件（持久卷）配置部分
       existingClaim: ""
       storageClass: "trivy-manual"
       subPath: ""
       accessMode: ReadWriteMany
-      size: 10Gi
+      size: 5Gi
 ```
 
 
