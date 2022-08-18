@@ -1,0 +1,150 @@
+<div align=center><font face="黑体" size=6>OOP - Unified Modeling Language</font></div>
+
+[toc]
+
+# 1 类图
+
+类图用于描述类于类之间的关系。
+
+[一张图](https://github.com/gdhucoder/Algorithms4/blob/master/designpattern/pic/umlcheatsheet.jpg)
+
+#### 1.1 依赖
+
+依赖关系是指类中用到了对方。可以是“类的成员属性”、“方法的返回类型”、“方法接收的参数类型”和“方法中使用到的类”。
+
+```java
+public class A {
+    private B personDao;
+
+    public void methd(C person) {
+    }
+
+    public D getDById(Integer id) {
+        return null;
+    }
+}
+
+public class B{}
+
+public class C{}
+
+public class D{}
+```
+
+
+
+#### 1.2 关联
+
+关联关系实际上就是类与类之间的关系，是依赖关系的特例。
+
+关联具有导航性：即双向关系或单向关系。
+
+关联具有多重性：如“1”（表示有且仅有一个），“0…”（表示0个或多个），“0，1”（表示0个或1个），“n…m”（表示n到m个都可以）。
+
+##### 1.2.1 单向关联
+
+```java
+public class A{
+    private B b;
+}
+
+public class B{}
+```
+
+
+
+##### 1.2.2 双向关联
+
+```java
+public class A{
+    private B b;
+}
+
+public class B{
+    private A a;
+}
+```
+
+#### 1.3 泛化
+
+泛化关系实际上就是继承关系，是依赖关系的特例。
+
+```java
+public abstract class A{
+    public void method(Object entity) {
+    }
+
+    public void delete(Object id);
+}
+
+public class B extends A {
+    public void delete(Object id){
+    }
+    
+    public void insert(Object id){
+        
+    }
+}
+```
+
+
+
+#### 1.4 实现
+
+实现关系实际上就是A类实现B类的接口，是依赖关系的特例。
+
+```java
+public interface class A{
+    public void delete(Object id);
+}
+
+public class B implements A {
+    public void delete(Object id){
+    }
+    
+    public void insert(Object id){
+        
+    }
+}
+```
+
+#### 1.5 聚合
+
+聚合关系表示的是整体和部分的关系，整体与部分可以分开。聚合关系是关联关系的特例，具有关联的导航性与多重性。
+
+#### 1.6 组合
+
+组合关系，也是整体与部分的关系，但是整体与部分不可以分开。
+
+**聚合与组合很近似，聚合没有绑定性，组合类中被组合的类强制关联，同时使用。**
+
+```java
+public class A{
+}
+
+public class B{
+}
+
+public class Composition{
+ 	private A a;            // 聚合关系，使用Composition，可以不使用A  
+    private B b = new B();  // 组合关系，使用Composition，必须有B
+    
+    public void setA(A a){
+        this.a = a;
+    }
+}
+```
+
+
+
+
+
+# 2 用例图
+
+# 3 顺序图
+
+# 4 活动图
+
+# 5 状态图
+
+# 6 组件图
