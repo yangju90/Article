@@ -23,7 +23,7 @@
 
 #### 零信任系统
 
-* 零信任系统：[易安联](https://www.zhihu.com/org/yi-an-lian-2/posts?page=7)
+* 零信任系统文章：[易安联](https://www.zhihu.com/org/yi-an-lian-2/posts?page=7)
 
 #### Saas
 
