@@ -23,6 +23,10 @@
 
 #### introduce
 
+#### Saas
+
+* 亚马逊云SaaS服务设计准则: [亚马逊文档](https://docs.aws.amazon.com/wellarchitected/latest/saas-lens/saas-lens.html)
+
 ##### Rbac
 
 ##### Abac
