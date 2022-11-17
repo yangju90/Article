@@ -1,6 +1,6 @@
 [TOC]
 
-![Sql 漏洞总结](Sql Security testing.png)
+![Sql Security testin](Sql Security testing.png)
 
 ### 1.SQL 注入
 
