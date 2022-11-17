@@ -40,7 +40,7 @@ set character_set_results = UTF-8
 
 #### 1.3 Union 注入
 
-![Union Injection](Union Injection.png)
+![Union Injection](Union注入.png)
 
 ### 2.常见组件漏洞查询
 
