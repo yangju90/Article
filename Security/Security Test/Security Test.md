@@ -1,6 +1,6 @@
 [TOC]
 
-![Sql Security testin](Sql Security testing.png)
+![Sql Security testing](Sql Security testing.png)
 
 ### 1.SQL 注入
 
