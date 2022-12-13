@@ -45,3 +45,10 @@
 * 阿里云权限策略文档：[阿里云文档](https://help.aliyun.com/document_detail/93732.html)
 * 亚马逊权限策略文档: [亚马逊文档](https://docs.aws.amazon.com/IAM/latest/UserGuide/getting-set-up.html)
 
+
+### 5 其它
+
+#### 5.1 信息收集
+
+* 国外sms 短信信息服务网址: [sms-activate](https://sms-activate.org/)
+
