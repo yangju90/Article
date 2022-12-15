@@ -44,6 +44,7 @@
 
 * 阿里云权限策略文档：[阿里云文档](https://help.aliyun.com/document_detail/93732.html)
 * 亚马逊权限策略文档: [亚马逊文档](https://docs.aws.amazon.com/IAM/latest/UserGuide/getting-set-up.html)
+* 权限相关文档：[权限](https://www.cnblogs.com/yjf512/p/12200206.html)
 
 
 ### 5 其它
