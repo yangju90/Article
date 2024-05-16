@@ -1,0 +1,34 @@
+﻿1.https://blog.csdn.net/zag666/article/details/128208391   NLP命名实体识别
+2.https://baijiahao.baidu.com/s?id=1650004369527655809&wfr=spider&for=pc  NLP 的命名实体识别 Jieba
+
+
+3.识别库 https://blog.csdn.net/sikh_0529/article/details/129328097
+4.过程 https://zhuanlan.zhihu.com/p/112380924?utm_oi=981832477358379008&utm_id=0
+
+5. spacy https://job.yanxishe.com/TextTranslation/3195
+
+6. 导航 https://blog.csdn.net/SYC20110120/article/details/132646555
+
+
+总体来看：  哈工大NLP 斯坦福NLP  hugging face  jieba分词 spacy 实体识别
+https://stanfordnlp.github.io/CoreNLP/
+https://github.com/stanfordnlp/CoreNLP  斯坦福NLP java 开发
+https://github.com/stanfordnlp/stanza   
+
+https://github.com/dongrixinyu/JioNLP
+
+https://github.com/ownthink/Jiagu
+
+https://github.com/fxsjy/jieba
+https://github.com/search?q=NER+NLP&type=repositories&s=stars&o=desc
+https://github.com/fighting41love/funNLP
+
+
+https://zhuanlan.zhihu.com/p/646863722
+
+https://gitee.com/mirrors/spacy
+
+
+
+评测信息：
+https://zhuanlan.zhihu.com/p/141014836   
