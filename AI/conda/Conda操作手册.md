@@ -151,3 +151,7 @@ conda search --override-channels --channel http://conda.anaconda.org/mutirri imi
 ```
 
 # 2. Conda
+
+#### 2.1 Docker地址
+
+> https://hub.docker.com/  Docker hub 仓库地址
