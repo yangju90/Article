@@ -173,7 +173,12 @@ conda search --override-channels --channel http://conda.anaconda.org/mutirri imi
   
   docker push  [harbor]/serving/notebook:v1
   ```
+* docker查看当前容器PID进程
 
+  ```shell
+  docker inspect --format '{{.State.Pid}}' Container_id
+  ```
+  
 #### 2.2 安装jupyterlab
 
 ```shell
