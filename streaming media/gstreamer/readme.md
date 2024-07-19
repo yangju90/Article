@@ -3,5 +3,6 @@
 ### 子页面：
 
 [Core Library](./Core Library/readme.md) — gstreamer 核心库
+[简体中文](./README_cn.md)
 
 
