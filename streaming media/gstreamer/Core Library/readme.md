@@ -6,5 +6,4 @@
 
 ### 子页面：
 
-[Running GStreamer Applications](./Running GStreamer Applications.md) — 如何运行和调试GStreamer应用程序
-
+[Running GStreamer Applications](./RunningGStreamerApplications.md) — 如何运行和调试GStreamer应用程序
