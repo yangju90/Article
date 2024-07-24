@@ -12,3 +12,10 @@
 
 `wsl --import Ubuntu-22.04 D:\SoftTools\subsystem D:\SoftTools\subsystem\Ubuntu.tar --version 2` 导入
 
+C:\Users\你的用户名\AppData\Local\Packages\* wsl 安装包
+
+
+
+
+
+Linux 安装deb包 https://pkgs.org/
