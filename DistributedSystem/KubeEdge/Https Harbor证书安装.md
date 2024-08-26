@@ -19,7 +19,7 @@ openssl req -x509 -new -nodes -sha512 -days 3650 \
  -out ca.crt
 ```
 
-##### 1.2 配置定义DNS的Https配置（未验证）
+##### 1.2 配置定义DNS的Https配置
 
 ```shell
 # 证书
