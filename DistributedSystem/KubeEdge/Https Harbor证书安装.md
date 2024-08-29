@@ -41,6 +41,7 @@ subjectAltName = @alt_names
 
 [alt_names]
 DNS.1=cetcharbor.com
+IP.1 = 192.168.8.212
 EOF
  
 # <4> 生成域名CA 
@@ -75,5 +76,18 @@ https:
   port: 443
   certificate: /data/cert/cetcharbor.com.cert
   private_key: /data/cert/cetcharbor.com.key
+```
+
+##### 1.3 证书本地可信
+
+```shell
+# 1. 验证自签证书是否可信，推荐用curl
+openssl s_client -connect <域名>:<端口>
+curl --head -v https://<域名>  
+
+# 2. linux添加证书到可信列表，将证书拷贝到 /usr/local/share/ca-certificates，执行更新证书
+ sudo update-ca-certificates
+ 
+# 3. 添加后，自签证书可信
 ```
 
