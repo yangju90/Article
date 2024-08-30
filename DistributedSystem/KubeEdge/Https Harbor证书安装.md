@@ -85,7 +85,8 @@ https:
 curl --head -v https://<域名>  
 
 # 2. linux添加证书到可信列表，将证书拷贝到 /usr/local/share/ca-certificates，执行更新证书
- sudo update-ca-certificates
+cp cetcharbor.com.crt /usr/local/share/ca-certificates
+sudo update-ca-certificates
  
 # 3. 添加后，自签证书可信
 ```
