@@ -81,6 +81,8 @@ https:
 ##### 1.3 证书本地可信
 
 ```shell
+tls: failed to verify certificate: x509: certificate signed by unknown authority 错误时添加证书可信
+
 # 1. 验证自签证书是否可信，推荐用curl
 curl --head -v https://<域名>  
 
