@@ -1,12 +1,22 @@
 #### 1. kubeedge安装
 
 ```shell
+# 1. 安装keadm到bin
+mv keadm /usr/local/bin/keadm
+chmod +777 -R /usr/local/bin/keadm
+
 # 重启
-keadm reset --kube-config=$HOME/.kube/config
+keadm reset --kube-config=/etc/rancher/rke2/rke2.yaml
 
 # 获取证书token
 keadm gettoken
 
+
+keadm init --advertise-address="192.168.56.206" --kube-config=/etc/rancher/rke2/rke2.yaml
+ 
+keadm manifest --advertise-address="192.168.56.206"  --kube-config=/etc/rancher/rke2/rke2.yaml > kubeedge-cloudcore.yaml
+ 
+keadm manifest --advertise-address=192.168.56.206  --kube-config=/etc/rancher/rke2/rke2.yaml > kubeedge-cloudcore.yaml
 ```
 
 #### 2. keadm安装edgecore
@@ -33,7 +43,7 @@ systemctl restart containerd
 # 如果你使用Keadm安装EdgeCore时，你需要设置
 --remote-runtime-endpoint=unix:///run/containerd/containerd.sock
 
-#KubeEdge默认使用cgroupfs cgroup驱动，如果你需要使用systemd cgroup驱动，你需要保证containerd配置了systemd cgroup，在执行keadm join时设置--cgroupdriver=systemd
+# KubeEdge默认使用cgroupfs cgroup驱动，如果你需要使用systemd cgroup驱动，你需要保证containerd配置了systemd cgroup，在执行keadm join时设置--cgroupdriver=systemd
 ```
 
 ###### (2) 使用二进制安装edgecore的运行配置
@@ -46,6 +56,47 @@ modules:
     tailoredKubeletConfig:
       cgroupDriver: systemd
 ```
+
+###### (3) 添加允许私有HTTPS连接，跳过证书验证
+
+新版本containerd，/etc/containerd/config.toml 下的`mirrors`和 `configs.tls`  已经废弃，采用 `config_path` 代替，参考https://github.com/containerd/containerd/blob/release/1.7/docs/hosts.md
+
+```shell
+sudo mkdir -p /etc/containerd/certs.d/cetcharbor.com:5000
+
+sudo tee /etc/containerd/certs.d/cetcharbor.com:5000/hosts.toml << EOF
+server = "http://cetcharbor.com:5000"
+
+[host."https://cetcharbor.com:5000"]
+capabilities = ["pull", "resolve", "push"]
+skip_verify = true
+EOF
+```
+
+编辑 `/etc/containerd/config.toml` 文件，添加或修改 `[plugins."io.containerd.grpc.v1.cri".registry]` 部分，使用 `config_path` 指向您创建的配置
+
+```shell
+[plugins."io.containerd.grpc.v1.cri".registry]
+config_path = "/etc/containerd/certs.d"
+```
+
+重启containerd服务
+
+```shell
+systemctl restart containerd
+```
+
+###### (4) containerd查看日志
+
+```shell
+containerd 查看运行日志
+```
+
+
+
+
+
+
 
 ##### 2.2 docker
 

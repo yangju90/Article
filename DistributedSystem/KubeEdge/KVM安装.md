@@ -95,13 +95,32 @@ partprobe $DISK
 kubectl get pod virt-launcher-i-sdj0cbnp-nn645 -o jsonpath='{.spec.containers[*].name}'
 ```
 
-#### 3.系统卸载
+#### 3. 系统卸载
 
 ```
 
 ```
 
 
+
+#### 4. 其他命令
+
+```shell
+# 过滤镜像
+ctr --namespace=k8s.io images ls | awk '{print $1}' | awk '!/sha256/'
+
+# 镜像打tag
+ctr images tag docker.io/kubespheredev/ksv-apiserver:v1.6.1 cetcharbor.com:5000/kubespheredev/ksv-apiserver:v1.6.1
+
+# 登录,跳过验证
+ctr i push -u admin:12345 --plain-http cetcharbor.com:5000/kubespheredev/ksv-apiserver:v1.6.1
+
+ctr i push -u admin:12345 cetcharbor.com:5000/kubespheredev/ksv-apiserver:v1.6.1
+
+
+# 删除
+ctr images rm cetcharbor.com:5000/kubespheredev/ksv-apiserver:v1.6.1
+```
 
 
 
