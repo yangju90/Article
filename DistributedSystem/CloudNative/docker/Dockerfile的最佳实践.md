@@ -198,3 +198,7 @@ docker push/pull <tagName>
 >
 > ​         `docker push ${docker_registry}/${contianer_name}:${tag}`
 
+
+#### 5. Docker Hub地址
+
+> https://hub.docker.com/  Docker hub 仓库地址

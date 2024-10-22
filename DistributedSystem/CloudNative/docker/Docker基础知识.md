@@ -78,6 +78,7 @@ network:
       dhcp4: no
       addresses:
         - 192.168.56.100/24
+      gateway4: 192.168.56.254
   version: 2
 ```
 
