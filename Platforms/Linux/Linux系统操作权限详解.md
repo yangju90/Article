@@ -15,6 +15,6 @@
 
 #### 二、sudo权限作用
 
-sudo权限的作用，sudo权限获取写（w）权限。
+sudo 权限的作用，sudo权限获取写（w）权限。
 sudo su 提权
 

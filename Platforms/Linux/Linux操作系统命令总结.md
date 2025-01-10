@@ -19,6 +19,7 @@
 1) 查看Linux版本
     cat /etc/issue
     uname -a
+2) pstree 命令可以查看系统中的所有进程，可以看出systemd是所有进程的父进程
 ```
 
 
