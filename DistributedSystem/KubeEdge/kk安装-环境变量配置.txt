@@ -1,0 +1,13 @@
+net.ipv4.ip_forward = 1
+net.bridge.bridge-nf-call-arptables = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_local_reserved_ports = 30000-32767
+vm.max_map_count = 262144
+vm.swappiness = 1
+fs.inotify.max_user_instances = 524288
+kernel.pid_max = 65535
+
+
+
+./kk create cluster -f config-sample.yaml
