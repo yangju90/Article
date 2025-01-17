@@ -138,6 +138,8 @@ spec:
             secretKeyRef:
               name: mysql-secret
               key: password
+        - name: MYSQL_TCP_SSL
+          value: "false"
         ports:
         - containerPort: 3306
         volumeMounts:
