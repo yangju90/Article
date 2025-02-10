@@ -154,6 +154,76 @@ spec:
         kubernetes.io/hostname: server
 ```
 
+#### 3. CloudBeaver在K8s环境中部署
+
+###### 3.1 DBeaver
+
+```shell
+jdbc:mysql://localhost:3306/mydatabase?allowPublicKeyRetrieval=true
+```
+
+###### 3.2 配置脚本
+
+```shell
+# 1.运行
+docker run --name cloudbeaver \
+  -v /data/cloudbeaver:/opt/cloudbeaver/workspace \
+  -p 8978:8978 \
+  -d dbeaver/cloudbeaver:24.3.4
+  
+# 2.后台常驻模式（Daemon mode）
+-d --restart unless-stopped 
+
+# 3.k8s部署
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudbeaver
+  namespace: mysql-namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudbeaver
+  template:
+    metadata:
+      labels:
+        app: cloudbeaver
+    spec:
+      containers:
+      - name: cloudbeaver
+        image: db/cloudbeaver:24.3.4
+        ports:
+        - containerPort: 8978
+        volumeMounts:
+        - name: cloudbeaver-storage
+          mountPath: /opt/cloudbeaver/workspace
+      volumes:
+      - name: cloudbeaver-storage
+        hostPath:
+          path: /data/cloudbeaver  # 主机上的存储路径，可根据需要修改
+          type: DirectoryOrCreate
+      nodeSelector:
+        kubernetes.io/hostname: server  # 节点选择器，将服务固定在 server 节点
+        
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudbeaver-service
+  namespace: mysql-namespace
+spec:
+  selector:
+    app: cloudbeaver
+  ports:
+  - protocol: TCP
+    port: 8978
+    targetPort: 8978
+    nodePort: 31978
+  type: NodePort
+```
+
 
 
 
