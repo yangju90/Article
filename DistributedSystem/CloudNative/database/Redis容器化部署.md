@@ -1,4 +1,4 @@
-#### 1. DM在K8s环境中部署
+#### 1. Redis在K8s环境中部署
 
 ###### 1.1 创建ConfigMap
 
@@ -63,7 +63,7 @@ data:
     requirepass redis#single#test
 ```
 
-###### 2.2 创建 HostPath 存储卷和 MySQL 的 Deployment
+###### 2.2 创建 HostPath 存储卷和 Redis 的 Deployment
 
 ```yaml
 apiVersion: v1
