@@ -140,3 +140,7 @@ spec:
               - key: redis.conf
                 path: redis.conf
 ```
+
+###### 2.4 集群参考
+
+`https://blog.csdn.net/muguazhi/article/details/132455056`
