@@ -1,6 +1,6 @@
-#### 1. DM在K8s环境中部署
+#### 1. Minio在K8s环境中部署
 
-###### 1.1 创建ConfigMap
+###### 1.1 创建Deployment
 
 ```shell
 # Deploys a new Namespace for the MinIO Pod
@@ -47,7 +47,7 @@ spec:
       type: DirectoryOrCreate # The path to the last directory must exist
 ```
 
-###### 2.2 创建 HostPath 存储卷和 MySQL 的 Deployment
+###### 2.2 Minio Service
 
 ```yaml
 apiVersion: v1
